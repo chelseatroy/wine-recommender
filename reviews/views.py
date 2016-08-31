@@ -9,7 +9,7 @@ import datetime
 
 def review_list(request):
     latest_review_list = Review.objects.order_by('-pub_date')[:9]
-    context = {'latest_review_list':latest_review_list}
+    context = {'latest_review_list': latest_review_list}
     return render(request, 'reviews/review_list.html', context)
 
 
@@ -20,7 +20,7 @@ def review_detail(request, review_id):
 
 def wine_list(request):
     wine_list = Wine.objects.order_by('-name')
-    context = {'wine_list':wine_list}
+    context = {'wine_list': wine_list}
     return render(request, 'reviews/wine_list.html', context)
 
 
@@ -28,6 +28,7 @@ def wine_detail(request, wine_id):
     wine = get_object_or_404(Wine, pk=wine_id)
     form = ReviewForm()
     return render(request, 'reviews/wine_detail.html', {'wine': wine, 'form': form})
+
 
 @login_required
 def add_review(request, wine_id):
@@ -51,13 +52,25 @@ def add_review(request, wine_id):
 
     return render(request, 'reviews/wine_detail.html', {'wine': wine, 'form': form})
 
+
 def user_review_list(request, username=None):
     if not username:
         username = request.user.username
     latest_review_list = Review.objects.filter(user_name=username).order_by('-pub_date')
-    context = {'latest_review_list':latest_review_list, 'username':username}
+    context = {'latest_review_list': latest_review_list, 'username': username}
     return render(request, 'reviews/user_review_list.html', context)
 
 @login_required
 def user_recommendation_list(request):
-    return render(request, 'reviews/user_recommendation_list.html', {'username': request.user.username})
+    # get this user reviews
+    user_reviews = Review.objects.filter(user_name=request.user.username).prefetch_related('wine')
+    # from the reviews, get a set of wine IDs
+    user_reviews_wine_ids = set(map(lambda x: x.wine.id, user_reviews))
+    # then get a wine list excluding the previous IDs
+    wine_list = Wine.objects.exclude(id__in=user_reviews_wine_ids)
+
+    return render(
+        request,
+        'reviews/user_recommendation_list.html',
+        {'username': request.user.username, 'wine_list': wine_list}
+    )
