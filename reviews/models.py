@@ -1,6 +1,6 @@
 from django.db import models
 import numpy as np
-
+from django.contrib.auth.models import User
 
 class Wine(models.Model):
     name = models.CharField(max_length=200)
@@ -27,3 +27,9 @@ class Review(models.Model):
     comment = models.CharField(max_length=200)
     rating = models.IntegerField(choices=RATING_CHOICES)
 
+class Cluster(models.Model):
+    name = models.CharField(max_length=100)
+    users = models.ManyToManyField(User)
+
+    def get_members(self):
+        return "\n".join([u.username for u in self.users.all()])

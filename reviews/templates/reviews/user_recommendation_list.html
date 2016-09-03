@@ -1,5 +1,23 @@
-{% extends 'reviews/wine_list.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
 <h2>Recommendations for {{ username }}</h2>
+{% endblock %}
+
+{% block content %}
+{% if wine_list %}
+<div class="row">
+    {% for wine in wine_list %}
+    <div class="col-xs-6 col-lg-4">
+        <h4><a href="{% url 'reviews:wine_detail' wine.id %}">
+        {{ wine.name }}
+        </a></h4>
+        <h5>{{ wine.review_set.count }} reviews</h5>
+        <h5>{{ wine.average_rating | floatformat }} average rating</h5>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+    <p>No recommendations available. Try rating some more wines so we can learn what you like!</p>
+{% endif %}
 {% endblock %}
