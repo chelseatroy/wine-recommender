@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from .suggestions import update_clusters
 from .models import Review, Wine, Cluster
 from .forms import ReviewForm
 import datetime
@@ -30,7 +31,6 @@ def wine_detail(request, wine_id):
     form = ReviewForm()
     return render(request, 'reviews/wine_detail.html', {'wine': wine, 'form': form})
 
-
 @login_required
 def add_review(request, wine_id):
     wine = get_object_or_404(Wine, pk=wine_id)
@@ -46,13 +46,11 @@ def add_review(request, wine_id):
         review.comment = comment
         review.pub_date = datetime.datetime.now()
         review.save()
+        update_clusters()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse('reviews:wine_detail', args=(wine.id,)))
-
-    return render(request, 'reviews/wine_detail.html', {'wine': wine, 'form': form})
-
 
 def user_review_list(request, username=None):
     if not username:
@@ -68,17 +66,14 @@ def user_recommendation_list(request):
     user_reviews = Review.objects.filter(user_name=request.user.username).prefetch_related('wine')
     user_reviews_wine_ids = set(map(lambda x: x.wine.id, user_reviews))
 
-    # get request user cluster name (just the first one right now)
-    user_first_cluster = \
-        User.objects.get(username=request.user.username).cluster_set.first()
-    if user_first_cluster is not None:
-        user_cluster_name = user_first_cluster.name
-    else:
-        return render(
-            request,
-            'reviews/user_recommendation_list.html',
-            {'username': request.user.username, 'wine_list': []}
-        )
+    # get request user cluster name (just the first one righ now)
+    try:
+        user_cluster_name = \
+            User.objects.get(username=request.user.username).cluster_set.first().name
+    except: # if no cluster has been assigned for a user, update clusters
+        update_clusters()
+        user_cluster_name = \
+            User.objects.get(username=request.user.username).cluster_set.first().name
 
     # get usernames for other members of the cluster
     user_cluster_other_members = \
