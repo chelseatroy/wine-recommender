@@ -40,7 +40,6 @@ django-bootstrap3==7.0.1
 django-registration-redux==1.4
 django-toolbelt==0.0.1
 docutils==0.12
-dynd==0.7.3.dev1
 enum34==1.1.6
 et-xmlfile==1.0.1
 fastcache==1.0.2
