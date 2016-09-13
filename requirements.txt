@@ -21,7 +21,7 @@ cloudpickle==0.2.1
 clyent==1.2.1
 colorama==0.3.7
 conda==4.1.6
-conda-env==2.5.0a0
+conda-env==2.4.2
 configobj==5.0.6
 configparser==3.5.0b2
 contextlib2==0.5.3
