@@ -1,1 +1,1 @@
-web: gunicorn wine-recommender.wsgi
+web: gunicorn winerama.wsgi
