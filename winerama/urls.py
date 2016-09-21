@@ -16,9 +16,10 @@ Including another URLconf
 from django.conf.urls import include
 from django.conf.urls import url
 from django.contrib import admin
+import views
 
 urlpatterns = [
-    url(r'^$', include('reviews.urls', namespace="reviews")),
+    url(r'^$', views.home, name='home'),
     url(r'^reviews/', include('reviews.urls', namespace="reviews")),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('registration.backends.simple.urls')),
