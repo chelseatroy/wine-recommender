@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .suggestions import update_clusters
 from .models import Review, Wine, Cluster
-from .forms import ReviewForm
+from .forms import ReviewForm, WineForm
 import datetime
 
 def review_list(request):
@@ -28,6 +28,28 @@ def wine_detail(request, wine_id):
     wine = get_object_or_404(Wine, pk=wine_id)
     form = ReviewForm()
     return render(request, 'reviews/wine_detail.html', {'wine': wine, 'form': form})
+
+@login_required
+def add_wine_form(request):
+    if request.method == 'GET':
+        form = WineForm()
+        return render(request, 'reviews/add_wine_form.html', {'form': form})
+    if request.method == 'POST':
+        form = WineForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            description = form.cleaned_data['description']
+            user_name = request.user.username
+            wine = Wine()
+            wine.name = name
+            wine.user_name = user_name
+            wine.description = description
+            wine.save()
+            # Always return an HttpResponseRedirect after successfully dealing
+            # with POST data. This prevents data from being posted twice if a
+            # user hits the Back button.
+            return HttpResponseRedirect(reverse('reviews:wine_detail', args=(wine.id,)))
+
 
 @login_required
 def add_review(request, wine_id):

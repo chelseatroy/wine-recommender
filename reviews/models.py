@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 
 class Wine(models.Model):
     name = models.CharField(max_length=200)
+    user_name = models.CharField(max_length=100, default = '')
+    description = models.CharField(max_length=200, default = '')
 
     def average_rating(self):
         all_ratings = map(lambda x: x.rating, self.review_set.all())

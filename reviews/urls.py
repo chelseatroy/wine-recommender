@@ -12,6 +12,8 @@ urlpatterns = [
     # ex: /wine/5/
     url(r'^wine/(?P<wine_id>[0-9]+)/$', views.wine_detail, name='wine_detail'),
     url(r'^wine/(?P<wine_id>[0-9]+)/add_review/$', views.add_review, name='add_review'),
+    url(r'^wine/add_wine/$', views.add_wine_form, name='add_wine_form'),
+    # url(r'^wine/add_wine/$', views.add_wine_form, name='add_wine_form'),
     # ex: /review/user - get reviews for the logged user
     url(r'^review/user/(?P<username>\w+)/$', views.user_review_list, name='user_review_list'),
     # ex: /review/user - get reviews for the user passed in the url
